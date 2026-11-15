@@ -54,3 +54,8 @@ app.include_router(router)
 @app.get("/", include_in_schema=False)
 def root():
     return {"name": "MARS-X API", "docs": "/docs", "health": "/api/v1/health"}
+
+
+@app.get("/healthz", include_in_schema=False)
+def healthz():
+    return {"status": "ok"}
