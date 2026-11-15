@@ -28,7 +28,7 @@ from .dem import Q_INTERPOLATED, Q_MEASURED, Q_NODATA, DemGrid, dem_for_route
 from .terrain import (H_CAUTION, H_HIGH, H_IMPASSABLE, H_NOMINAL, H_UNKNOWN, HAZARD_LABELS, hazard_classes,
                       roughness_m, slope_deg)
 
-MAX_ROUTE_M = 12_000_000.0  # no practical cap: long trips fall back to the 3.7 km global MOLA grid
+MAX_ROUTE_M = 2_000_000.0  # 2,000 km single-traverse limit; break longer journeys into legs
 DIRS = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
 
 PROFILES = {
@@ -346,7 +346,7 @@ def plan_routes(start: tuple[float, float], goal: tuple[float, float], weights: 
     if not (0 < max_slope_deg <= 45):
         raise RouteError("max_slope_deg must be in (0, 45]")
     if straight > MAX_ROUTE_M:
-        raise RouteError(f"start and destination are {straight / 1000:.0f} km apart, beyond the planner limit")
+        raise RouteError(f"start and destination are {straight / 1000:.0f} km apart, beyond the planner limit; break journeys into shorter legs")
     west, south, east, north = _window(lon1, lat1, lon2, lat2)
     # best DEM for the trip: HiRISE patch > CTX (Jezero) > MOLA 463 m > MOLA 3.7 km for long traverses
     full = dem_for_route(lon1, lat1, lon2, lat2, west, south, east, north)
