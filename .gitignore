@@ -1,0 +1,17 @@
+# dependencies / build output
+node_modules/
+.next/
+frontend/public/cesium/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# local data
+*.db
+backend/data_cache/
+
+# secrets
+.env

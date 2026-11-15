@@ -1,0 +1,20 @@
+# MARS-X backend runtime + test dependencies.
+# Pinned to the versions installed in backend/.venv on the build machine (Python 3.14, Windows).
+# Optional native GeoTIFF acceleration lives in requirements-geo.txt.
+#
+# SQLAlchemy note (Windows hosts with Application Control): if the compiled C extension
+# is blocked, install it pure-Python instead:
+#   DISABLE_SQLALCHEMY_CEXT=1 pip install --no-binary sqlalchemy sqlalchemy==2.1.8
+fastapi==0.162.7
+uvicorn[standard]==0.54.0
+pydantic==2.14.3
+pydantic-settings==2.16.3
+numpy==2.5.4
+scipy==1.18.1
+pillow==13.0.0
+httpx==0.28.1
+sqlalchemy==2.1.8
+alembic==1.20.1
+psycopg[binary]==3.3.9
+anthropic==2.8.0
+pytest==9.2.0

@@ -1,0 +1,54 @@
+# MARS-X full stack: PostGIS + FastAPI backend + Next.js frontend.
+# Usage:  cp .env.example .env   (optional: add ANTHROPIC_API_KEY)  then  docker compose up --build
+# Not executed on the development machine (Docker daemon not running there).
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-marsx}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-marsx}
+      POSTGRES_DB: ${POSTGRES_DB:-marsx}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-marsx} -d ${POSTGRES_DB:-marsx}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MARSX_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-marsx}:${POSTGRES_PASSWORD:-marsx}@db:5432/${POSTGRES_DB:-marsx}
+      MARSX_CACHE_DIR: /data/cache
+      MARSX_CORS_ORIGINS: ${MARSX_CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      MARSX_OFFLINE: ${MARSX_OFFLINE:-false}
+      MARSX_AI_MODEL: ${MARSX_AI_MODEL:-claude-opus-5-5}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      - nasa_cache:/data/cache
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  nasa_cache:

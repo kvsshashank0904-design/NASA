@@ -1,0 +1,8 @@
+# Optional: native GeoTIFF reader (bundles GDAL in its wheels).
+#
+# app/services/dem.py tries `import rasterio` first to read the Jezero CTX DTM and falls
+# back to Pillow + GeoTIFF tags (ModelPixelScale / ModelTiepoint) when rasterio cannot be
+# imported. On the Windows build machine, Application Control blocks rasterio's native
+# DLLs, so local development runs on the Pillow path. The Docker image installs this file
+# so the rasterio path is used there. The application works without it.
+rasterio==1.5.2
